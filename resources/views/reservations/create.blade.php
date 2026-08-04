@@ -91,19 +91,25 @@
                             </div>
 
                             <div class="col-12">
-                                <label for="email" class="form-label">
-                                    Adresse e-mail *
-                                </label>
+    <label for="email" class="form-label">
+        Adresse e-mail *
+    </label>
 
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    class="form-control"
-                                    value="{{ old('email') }}"
-                                    required
-                                >
-                            </div>
+    <input
+        type="email"
+        id="email"
+        name="email"
+        class="form-control @error('email') is-invalid @enderror"
+        value="{{ old('email') }}"
+        required
+    >
+
+    @error('email')
+        <div class="invalid-feedback">
+            {{ $message }}
+        </div>
+    @enderror
+</div>
 
                             <div class="col-md-6">
                                 <label for="phone" class="form-label">

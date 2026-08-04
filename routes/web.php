@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
 use Illuminate\Support\Facades\Route;
@@ -12,3 +13,6 @@ Route::get('/reservation/{eventSession}', [ReservationController::class, 'create
 
 Route::post('/reservation/{eventSession}', [ReservationController::class, 'store'])
     ->name('reservations.store');
+
+Route::get('/admin', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');

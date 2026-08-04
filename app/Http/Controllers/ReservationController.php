@@ -26,6 +26,17 @@ class ReservationController extends Controller
         'club'      => ['nullable', 'string', 'max:150'],
     ]);
 
+    if ($eventSession->participants()
+    ->where('email', $validated['email'])
+    ->exists()) {
+
+    return back()
+        ->withInput()
+        ->withErrors([
+            'email' => 'Cette adresse e-mail est déjà inscrite pour cette session.',
+        ]);
+}
+
     $eventSession->participants()->create([
         ...$validated,
         'confirmed' => true,
