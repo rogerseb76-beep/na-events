@@ -1,169 +1,154 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NA Events | Journée UUKHA</title>
+@extends('layouts.app')
 
-    <style>
-        body{
-            margin:0;
-            font-family:Arial, Helvetica, sans-serif;
-            background:#f4f7fa;
-            color:#222;
-        }
+@section('title', 'Journée UUKHA')
 
-        header{
-            background:#ffffff;
-            padding:20px 50px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            box-shadow:0 2px 10px rgba(0,0,0,.08);
-        }
+@section('content')
 
-        .logo{
-            font-size:28px;
-            font-weight:bold;
-            color:#004b87;
-        }
+<header class="site-header">
+    <div class="container header-inner">
 
-        .hero{
-            max-width:1100px;
-            margin:auto;
-            padding:80px 30px;
-            text-align:center;
-        }
+        <div class="logo-box">
+            <img
+                src="{{ asset('images/logos/normandie-archerie.png') }}"
+                alt="Logo Normandie Archerie"
+                class="brand-logo brand-logo-na"
+            >
+        </div>
 
-        h1{
-            font-size:48px;
-            margin-bottom:15px;
-            color:#004b87;
-        }
+        <div class="logo-box">
+            <img
+                src="{{ asset('images/logos/uukha.png') }}"
+                alt="Logo UUKHA"
+                class="brand-logo brand-logo-uukha"
+            >
+        </div>
 
-        h2{
-            color:#c62828;
-            margin-bottom:40px;
-        }
-
-        .card-container{
-            display:flex;
-            gap:25px;
-            justify-content:center;
-            flex-wrap:wrap;
-            margin-top:60px;
-        }
-
-        .card{
-            width:280px;
-            background:white;
-            border-radius:15px;
-            padding:25px;
-            box-shadow:0 8px 20px rgba(0,0,0,.08);
-            transition:.3s;
-        }
-
-        .card:hover{
-            transform:translateY(-6px);
-        }
-
-        button{
-            width:100%;
-            margin-top:20px;
-            padding:14px;
-            border:none;
-            border-radius:8px;
-            background:#004b87;
-            color:white;
-            font-size:16px;
-            cursor:pointer;
-        }
-
-        button:hover{
-            background:#00345f;
-        }
-
-        footer{
-            margin-top:80px;
-            padding:30px;
-            text-align:center;
-            background:white;
-        }
-
-    </style>
-
-</head>
-<body>
-
-<header>
-
-    <div class="logo">
-        NORMANDIE ARCHERIE
     </div>
-
-    <div>
-        Démonstration UUKHA
-    </div>
-
 </header>
 
-<section class="hero">
+<main>
 
-    <h1>Journée de démonstration UUKHA</h1>
+    <section class="hero">
+        <div class="container text-center">
 
-    <h2>Samedi 3 octobre 2026</h2>
+            <p class="event-label">NORMANDIE ARCHERIE PRÉSENTE</p>
 
-    <p>
+            <h1 class="display-4 fw-bold">
+                Journée de démonstration UUKHA
+            </h1>
 
-        63 Boulevard Charles de Gaulle<br>
+            <p class="event-date">
+                Samedi 3 octobre 2026
+            </p>
 
-        Actipôle des Chartreux<br>
+            <p class="lead mx-auto event-intro">
+                Venez découvrir et essayer gratuitement le matériel UUKHA
+                dans les installations de Normandie Archerie.
+            </p>
 
-        76140 Le Petit-Quevilly
-
-    </p>
-
-    <div class="card-container">
-
-        <div class="card">
-
-            <h3>10h00 - 12h00</h3>
-
-            <p>12 places disponibles</p>
-
-            <button>Réserver</button>
+            <a href="#sessions" class="btn btn-na btn-lg px-4">
+                Réserver gratuitement
+            </a>
 
         </div>
+    </section>
 
-        <div class="card">
+    <section id="sessions" class="py-5">
+        <div class="container">
 
-            <h3>13h00 - 15h00</h3>
+            <div class="text-center mb-5">
+                <h2 class="section-title">Choisissez votre session</h2>
+                <p>12 participants maximum par créneau.</p>
+            </div>
 
-            <p>12 places disponibles</p>
+            <div class="row g-4">
 
-            <button>Réserver</button>
+                <div class="col-md-4">
+                    <div class="card card-session h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <p class="session-number">SESSION 1</p>
+                            <h3>10h00 – 12h00</h3>
+                            <p class="places">12 places restantes</p>
+
+                            <div class="progress mb-4">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+
+                            <button class="btn btn-na w-100">
+                                Réserver ce créneau
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-session h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <p class="session-number">SESSION 2</p>
+                            <h3>13h00 – 15h00</h3>
+                            <p class="places">12 places restantes</p>
+
+                            <div class="progress mb-4">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+
+                            <button class="btn btn-na w-100">
+                                Réserver ce créneau
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card card-session h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <p class="session-number">SESSION 3</p>
+                            <h3>15h30 – 17h30</h3>
+                            <p class="places">12 places restantes</p>
+
+                            <div class="progress mb-4">
+                                <div class="progress-bar" style="width: 0%"></div>
+                            </div>
+
+                            <button class="btn btn-na w-100">
+                                Réserver ce créneau
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="location-section py-5">
+        <div class="container text-center">
+
+            <h2 class="section-title">Informations pratiques</h2>
+
+            <p class="mt-4">
+                <strong>Normandie Archerie</strong><br>
+                63 Boulevard Charles de Gaulle<br>
+                Actipôle des Chartreux<br>
+                76140 Le Petit-Quevilly
+            </p>
+
+            <a
+                href="https://www.google.com/maps/search/?api=1&query=63+Boulevard+Charles+de+Gaulle+76140+Le+Petit-Quevilly"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-outline-dark"
+            >
+                Calculer mon itinéraire
+            </a>
 
         </div>
+    </section>
 
-        <div class="card">
+</main>
 
-            <h3>15h30 - 17h30</h3>
-
-            <p>12 places disponibles</p>
-
-            <button>Réserver</button>
-
-        </div>
-
-    </div>
-
-</section>
-
-<footer>
-
-© 2026 Normandie Archerie
-
+<footer class="bg-dark text-white text-center py-4">
+    © 2026 Normandie Archerie
 </footer>
 
-</body>
-</html>
+@endsection
