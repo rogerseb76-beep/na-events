@@ -28,6 +28,14 @@
 
 <main>
 
+@if(session('success'))
+    <div class="container pt-4">
+        <div class="alert alert-success text-center">
+            {{ session('success') }}
+        </div>
+    </div>
+@endif
+
     <section class="hero">
         <div class="container text-center">
 
@@ -45,9 +53,9 @@
                 {{ $event->description }}
             </p>
 
-            <a href="#sessions" class="btn btn-na btn-lg px-4">
-                Réserver gratuitement
-            </a>
+           <a href="#sessions" class="btn btn-na btn-lg px-4">
+    Réserver gratuitement
+</a>
 
         </div>
     </section>
@@ -111,9 +119,12 @@
                                         Complet
                                     </button>
                                 @else
-                                    <button class="btn btn-na w-100">
-                                        Réserver ce créneau
-                                    </button>
+                                    <a
+    href="{{ route('reservations.create', $session) }}"
+    class="btn btn-na w-100"
+>
+    Réserver ce créneau
+</a>
                                 @endif
 
                             </div>
