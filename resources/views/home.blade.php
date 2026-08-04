@@ -34,16 +34,15 @@
             <p class="event-label">NORMANDIE ARCHERIE PRÉSENTE</p>
 
             <h1 class="display-4 fw-bold">
-                Journée de démonstration UUKHA
+                {{ $event->title }}
             </h1>
 
             <p class="event-date">
-                Samedi 3 octobre 2026
+                {{ $event->event_date->translatedFormat('l j F Y') }}
             </p>
 
             <p class="lead mx-auto event-intro">
-                Venez découvrir et essayer gratuitement le matériel UUKHA
-                dans les installations de Normandie Archerie.
+                {{ $event->description }}
             </p>
 
             <a href="#sessions" class="btn btn-na btn-lg px-4">
@@ -63,59 +62,73 @@
 
             <div class="row g-4">
 
-                <div class="col-md-4">
-                    <div class="card card-session h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <p class="session-number">SESSION 1</p>
-                            <h3>10h00 – 12h00</h3>
-                            <p class="places">12 places restantes</p>
+                @forelse($event->sessions as $session)
 
-                            <div class="progress mb-4">
-                                <div class="progress-bar" style="width: 0%"></div>
+                    @php
+                        $reserved = $session->capacity - $session->remaining_places;
+
+                        $percentage = $session->capacity > 0
+                            ? ($reserved / $session->capacity) * 100
+                            : 0;
+                    @endphp
+
+                    <div class="col-md-4">
+                        <div class="card card-session h-100 shadow-sm">
+                            <div class="card-body text-center p-4">
+
+                                <p class="session-number">
+                                    {{ strtoupper($session->title) }}
+                                </p>
+
+                                <h3>
+                                    {{ substr($session->start_time, 0, 5) }}
+                                    –
+                                    {{ substr($session->end_time, 0, 5) }}
+                                </h3>
+
+                                <p class="places">
+                                    @if($session->is_full)
+                                        Complet
+                                    @else
+                                        {{ $session->remaining_places }}
+                                        {{ $session->remaining_places > 1 ? 'places restantes' : 'place restante' }}
+                                    @endif
+                                </p>
+
+                                <div class="progress mb-4">
+                                    <div
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        style="width: {{ $percentage }}%"
+                                        aria-valuenow="{{ $percentage }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    ></div>
+                                </div>
+
+                                @if($session->is_full)
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        Complet
+                                    </button>
+                                @else
+                                    <button class="btn btn-na w-100">
+                                        Réserver ce créneau
+                                    </button>
+                                @endif
+
                             </div>
-
-                            <button class="btn btn-na w-100">
-                                Réserver ce créneau
-                            </button>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-4">
-                    <div class="card card-session h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <p class="session-number">SESSION 2</p>
-                            <h3>13h00 – 15h00</h3>
-                            <p class="places">12 places restantes</p>
+                @empty
 
-                            <div class="progress mb-4">
-                                <div class="progress-bar" style="width: 0%"></div>
-                            </div>
-
-                            <button class="btn btn-na w-100">
-                                Réserver ce créneau
-                            </button>
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            Aucun créneau disponible pour le moment.
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-4">
-                    <div class="card card-session h-100 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <p class="session-number">SESSION 3</p>
-                            <h3>15h30 – 17h30</h3>
-                            <p class="places">12 places restantes</p>
-
-                            <div class="progress mb-4">
-                                <div class="progress-bar" style="width: 0%"></div>
-                            </div>
-
-                            <button class="btn btn-na w-100">
-                                Réserver ce créneau
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                @endforelse
 
             </div>
         </div>

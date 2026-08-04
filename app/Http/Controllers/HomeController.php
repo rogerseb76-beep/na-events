@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
+
 class HomeController extends Controller
 {
-    /**
-     * Affiche la page d'accueil.
-     */
     public function index()
     {
-        return view('home');
+        $event = Event::with('sessions')->first();
+
+        return view('home', compact('event'));
     }
 }
