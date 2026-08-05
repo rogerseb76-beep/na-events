@@ -18,6 +18,46 @@
             </a>
         </div>
 
+        <div class="row g-4 mb-5">
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="text-muted mb-2">Participants inscrits</p>
+                <p class="display-6 fw-bold mb-0">
+                    {{ $totalParticipants }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="text-muted mb-2">Places restantes</p>
+                <p class="display-6 fw-bold mb-0">
+                    {{ $remainingPlaces }}
+                </p>
+                <p class="small text-muted mb-0">
+                    sur {{ $totalCapacity }} places
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="text-muted mb-2">Sessions</p>
+                <p class="display-6 fw-bold mb-0">
+                    {{ $event->sessions->count() }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
         <div class="row g-4">
 
             @foreach($event->sessions as $session)
