@@ -5,54 +5,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>@yield('title') - NA Events</title>
+    <title>@yield('title', 'Administration') - NA Events</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js'
+    ])
 </head>
 
 <body class="bg-light">
 
-<nav class="admin-navbar">
-    <div class="container admin-navbar-inner">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
 
-        <a class="admin-brand" href="{{ route('home') }}">
+        <a
+            class="navbar-brand fw-bold text-warning"
+            href="{{ route('admin.dashboard') }}"
+        >
             NORMANDIE ARCHERIE
         </a>
 
-        <div class="admin-navbar-links">
-            <a href="{{ route('home') }}" class="admin-navbar-link">
-                Accueil
-            </a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#adminNavbar"
+            aria-controls="adminNavbar"
+            aria-expanded="false"
+            aria-label="Afficher le menu"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <a href="{{ route('admin.dashboard') }}" class="admin-navbar-link">
-                Administration
-            </a>
+        <div class="collapse navbar-collapse" id="adminNavbar">
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                        href="{{ route('admin.dashboard') }}"
+                    >
+                        Tableau de bord
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.participants*') ? 'active' : '' }}"
+                        href="{{ route('admin.participants') }}"
+                    >
+                        Participants
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        href="{{ route('home') }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Site public
+                    </a>
+                </li>
+
+            </ul>
+
+            @auth
+                <div class="d-flex align-items-center gap-3">
+
+                    <span class="navbar-text text-light">
+                        {{ auth()->user()->name }}
+                    </span>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="btn btn-outline-warning btn-sm"
+                        >
+                            Déconnexion
+                        </button>
+                    </form>
+
+                </div>
+            @endauth
+
         </div>
-
-        @auth
-            <div class="admin-navbar-account">
-                <span class="admin-user-name">
-                    {{ auth()->user()->name }}
-                </span>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <button type="submit" class="admin-logout-button">
-                        Déconnexion
-                    </button>
-                </form>
-            </div>
-        @endauth
 
     </div>
 </nav>
 
-<div class="container py-5">
+<main class="container py-5">
+
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
     @yield('content')
 
-</div>
+</main>
 
 </body>
 </html>

@@ -1,137 +1,217 @@
 @extends('layouts.admin')
 
-@section('title', 'Administration')
+@section('title', 'Tableau de bord')
 
 @section('content')
 
-<main class="py-5">
-    <div class="container">
+@php
+    $globalRate = $totalCapacity > 0
+        ? round(($totalParticipants / $totalCapacity) * 100)
+        : 0;
+@endphp
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+<section class="dashboard-hero">
+    <div>
+        <p class="dashboard-kicker">TABLEAU DE BORD</p>
+
+        <h1 class="dashboard-title">
+            {{ $event->title }}
+        </h1>
+
+        <p class="dashboard-date">
+            {{ $event->event_date->translatedFormat('l j F Y') }}
+        </p>
+    </div>
+
+    <a href="{{ route('home') }}" class="btn btn-outline-dark">
+        Voir le site public
+    </a>
+</section>
+
+<section class="row g-4 mb-5">
+
+    <div class="col-md-4">
+        <article class="dashboard-stat">
+            <div class="dashboard-stat-icon">👥</div>
+
             <div>
-                <p class="session-number mb-1">ADMINISTRATION</p>
-                <h1 class="h2 mb-0">{{ $event->title }}</h1>
-            </div>
+                <span class="dashboard-stat-label">
+                    Participants
+                </span>
 
-            <a href="{{ route('home') }}" class="btn btn-outline-dark">
-                Voir le site
-            </a>
-        </div>
-
-        <div class="row g-4 mb-5">
-
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Participants inscrits</p>
-                <p class="display-6 fw-bold mb-0">
+                <strong class="dashboard-stat-number">
                     {{ $totalParticipants }}
-                </p>
+                </strong>
+
+                <span class="dashboard-stat-caption">
+                    {{ $totalParticipants > 1 ? 'inscrits' : 'inscrit' }}
+                </span>
             </div>
-        </div>
+        </article>
     </div>
 
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Places restantes</p>
-                <p class="display-6 fw-bold mb-0">
+        <article class="dashboard-stat">
+            <div class="dashboard-stat-icon">🎯</div>
+
+            <div>
+                <span class="dashboard-stat-label">
+                    Places disponibles
+                </span>
+
+                <strong class="dashboard-stat-number">
                     {{ $remainingPlaces }}
-                </p>
-                <p class="small text-muted mb-0">
-                    sur {{ $totalCapacity }} places
-                </p>
+                </strong>
+
+                <span class="dashboard-stat-caption">
+                    sur {{ $totalCapacity }}
+                </span>
             </div>
-        </div>
+        </article>
     </div>
 
     <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
-                <p class="text-muted mb-2">Sessions</p>
-                <p class="display-6 fw-bold mb-0">
-                    {{ $event->sessions->count() }}
-                </p>
+        <article class="dashboard-stat">
+            <div class="dashboard-stat-icon">📊</div>
+
+            <div>
+                <span class="dashboard-stat-label">
+                    Remplissage global
+                </span>
+
+                <strong class="dashboard-stat-number">
+                    {{ $globalRate }} %
+                </strong>
+
+                <span class="dashboard-stat-caption">
+                    {{ $sessions->count() }} sessions
+                </span>
             </div>
-        </div>
+        </article>
     </div>
 
-</div>
+</section>
 
-        <div class="row g-4">
+<section class="dashboard-section-header">
+    <div>
+        <p class="dashboard-kicker">CRÉNEAUX</p>
+        <h2>Suivi des sessions</h2>
+    </div>
+</section>
 
-            @foreach($event->sessions as $session)
+<section class="row g-4">
 
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body p-4">
+    @foreach($sessions as $session)
 
-                            <p class="session-number mb-2">
-                                {{ strtoupper($session->title) }}
-                            </p>
+        @php
+            $registered = $session->participants->count();
+            $remaining = max(0, $session->capacity - $registered);
 
-                            <h2 class="h4">
-                                {{ substr($session->start_time, 0, 5) }}
-                                –
-                                {{ substr($session->end_time, 0, 5) }}
-                            </h2>
+            $rate = $session->capacity > 0
+                ? round(($registered / $session->capacity) * 100)
+                : 0;
 
-                            <p class="mb-3">
-                                {{ $session->participants->count() }}
-                                inscrit(s) sur
-                                {{ $session->capacity }}
-                            </p>
+            $statusClass = match (true) {
+                $remaining === 0 => 'session-status-full',
+                $remaining <= 3 => 'session-status-warning',
+                default => 'session-status-available',
+            };
 
-                            <div class="progress mb-4">
-                                @php
-                                    $percentage = $session->capacity > 0
-                                        ? ($session->participants->count() / $session->capacity) * 100
-                                        : 0;
-                                @endphp
+            $statusText = match (true) {
+                $remaining === 0 => 'Complet',
+                $remaining <= 3 => 'Presque complet',
+                default => 'Disponible',
+            };
+        @endphp
 
-                                <div
-                                    class="progress-bar"
-                                    style="width: {{ $percentage }}%"
-                                ></div>
-                            </div>
+        <div class="col-lg-4">
+            <article class="dashboard-session">
 
-                            <hr>
+                <header class="dashboard-session-header">
+                    <div>
+                        <p class="dashboard-session-name">
+                            {{ strtoupper($session->title) }}
+                        </p>
 
-                            @forelse($session->participants as $participant)
-
-                                <div class="py-2 border-bottom">
-                                    <strong>
-                                        {{ $participant->firstname }}
-                                        {{ $participant->lastname }}
-                                    </strong>
-
-                                    <div class="small text-muted">
-                                        {{ $participant->email }}
-                                    </div>
-
-                                    @if($participant->club)
-                                        <div class="small">
-                                            Club : {{ $participant->club }}
-                                        </div>
-                                    @endif
-                                </div>
-
-                            @empty
-
-                                <p class="text-muted mb-0">
-                                    Aucun participant pour cette session.
-                                </p>
-
-                            @endforelse
-
-                        </div>
+                        <h3>
+                            {{ substr($session->start_time, 0, 5) }}
+                            –
+                            {{ substr($session->end_time, 0, 5) }}
+                        </h3>
                     </div>
+
+                    <span class="session-status {{ $statusClass }}">
+                        {{ $statusText }}
+                    </span>
+                </header>
+
+                <div class="dashboard-session-count">
+                    <strong>{{ $registered }} / {{ $session->capacity }}</strong>
+
+                    <span>
+                        {{ $remaining }}
+                        {{ $remaining > 1 ? 'places restantes' : 'place restante' }}
+                    </span>
                 </div>
 
-            @endforeach
+                <div class="progress dashboard-progress">
+                    <div
+                        class="progress-bar"
+                        style="width: {{ $rate }}%"
+                        role="progressbar"
+                        aria-valuenow="{{ $rate }}"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                    ></div>
+                </div>
 
+                <p class="dashboard-progress-label">
+                    {{ $rate }} % de remplissage
+                </p>
+
+                <div class="dashboard-participants">
+
+                    @forelse($session->participants->take(3) as $participant)
+
+                        <div class="dashboard-participant">
+                            <div class="participant-initials">
+                                {{ strtoupper(substr($participant->firstname, 0, 1)) }}
+                                {{ strtoupper(substr($participant->lastname, 0, 1)) }}
+                            </div>
+
+                            <div>
+                                <strong>
+                                    {{ $participant->firstname }}
+                                    {{ $participant->lastname }}
+                                </strong>
+
+                                <small>
+                                    {{ $participant->email }}
+                                </small>
+                            </div>
+                        </div>
+
+                    @empty
+
+                        <p class="dashboard-empty">
+                            Aucun participant inscrit.
+                        </p>
+
+                    @endforelse
+
+                    @if($registered > 3)
+                        <p class="dashboard-more">
+                            + {{ $registered - 3 }} autre(s) participant(s)
+                        </p>
+                    @endif
+
+                </div>
+
+            </article>
         </div>
-    </div>
-</main>
+
+    @endforeach
+
+</section>
 
 @endsection
