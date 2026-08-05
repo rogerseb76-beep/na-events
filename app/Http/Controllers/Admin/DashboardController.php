@@ -8,22 +8,28 @@ use App\Models\Event;
 class DashboardController extends Controller
 {
     public function index()
-{
-    $event = Event::with('sessions.participants')->first();
+    {
+        $event = Event::with('sessions.participants')->firstOrFail();
 
-    $totalParticipants = $event->sessions->sum(
-        fn ($session) => $session->participants->count()
-    );
+        $sessions = $event->sessions;
 
-    $totalCapacity = $event->sessions->sum('capacity');
+        $totalParticipants = $sessions->sum(
+            fn ($session) => $session->participants->count()
+        );
 
-    $remainingPlaces = $totalCapacity - $totalParticipants;
+        $totalCapacity = $sessions->sum('capacity');
 
-    return view('admin.dashboard', [
-        'event' => $event,
-        'totalParticipants' => $totalParticipants,
-        'totalCapacity' => $totalCapacity,
-        'remainingPlaces' => $remainingPlaces,
-    ]);
-}
+        $remainingPlaces = max(
+            0,
+            $totalCapacity - $totalParticipants
+        );
+
+        return view('admin.dashboard', compact(
+            'event',
+            'sessions',
+            'totalParticipants',
+            'totalCapacity',
+            'remainingPlaces'
+        ));
+    }
 }
