@@ -370,3 +370,34 @@ body {
 
     font-size:.85rem;
 }
+/* ==========================================================
+   PROGRESS
+========================================================== */
+
+.na-progress-wrapper{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.na-progress-wrapper .progress{
+    flex:1;
+    border-radius:999px;
+    background:#ececec;
+    overflow:hidden;
+}
+
+.na-progress-bar{
+    transition:width .4s ease;
+}
+
+.na-progress-gold{
+    background:#c9a227;
+}
+
+.na-progress-value{
+    min-width:52px;
+    text-align:right;
+    font-weight:700;
+    color:#555;
+}

@@ -235,16 +235,9 @@
 
                         </div>
 
-                        <div class="progress dashboard-progress">
-                            <div
-                                class="progress-bar"
-                                role="progressbar"
-                                style="width: {{ $percentage }}%"
-                                aria-valuenow="{{ $percentage }}"
-                                aria-valuemin="0"
-                                aria-valuemax="100"
-                            ></div>
-                        </div>
+                        <x-admin.progress
+    :value="$percentage"
+/>
 
                         <p class="dashboard-progress-label">
                             {{ $percentage }} % de remplissage
