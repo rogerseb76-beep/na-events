@@ -4,19 +4,20 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <p class="dashboard-kicker mb-1">ADMINISTRATION</p>
-        <h1 class="h2 mb-0">Événements</h1>
-    </div>
-
-    <a
-        href="{{ route('admin.events.create') }}"
-        class="btn btn-dark"
-    >
-        + Nouvel événement
-    </a>
-</div>
+<x-admin.page-header
+    eyebrow="ADMINISTRATION"
+    title="Événements"
+    subtitle="Créez, modifiez et gérez les événements de Normandie Archerie."
+>
+    <x-slot:actions>
+        <a
+            href="{{ route('admin.events.create') }}"
+            class="btn btn-na-primary"
+        >
+            + Nouvel événement
+        </a>
+    </x-slot:actions>
+</x-admin.page-header>
 
 @if($events->isEmpty())
 
@@ -31,82 +32,157 @@
         @foreach($events as $event)
 
             <div class="col-lg-6">
-                <article class="card border-0 shadow-sm h-100">
-                    <div class="card-body p-4">
 
-                        <div class="d-flex justify-content-between gap-3 mb-3">
-                            <div>
-                                <p class="dashboard-kicker mb-2">
-                                    {{ $event->event_date->translatedFormat('l j F Y') }}
-                                </p>
+                <x-admin.card class="h-100">
 
-                                <h2 class="h4 mb-2">
-                                    {{ $event->title }}
-                                </h2>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
 
-                                <p class="text-muted mb-0">
-                                    {{ $event->location }}
-                                </p>
-                            </div>
+                        <div>
 
-                            <div>
-                                @if($event->is_active)
-                                    <span class="badge text-bg-success">
-                                        Actif
-                                    </span>
-                                @else
-                                    <span class="badge text-bg-secondary">
-                                        Inactif
-                                    </span>
-                                @endif
-                            </div>
+                            <p class="na-eyebrow mb-2">
+                                {{ $event->event_date->translatedFormat('l j F Y') }}
+                            </p>
+
+                            <h2 class="h4 mb-2">
+                                {{ $event->title }}
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                {{ $event->location }}
+                            </p>
+
                         </div>
 
-                        <p>
-                            {{ \Illuminate\Support\Str::limit(
-                                $event->description,
-                                180
-                            ) }}
-                        </p>
+                        <div>
 
-                        <p class="small text-muted">
-                            {{ $event->sessions_count }}
-                            {{ $event->sessions_count > 1 ? 'sessions' : 'session' }}
-                        </p>
+                            @if($event->is_active)
 
-                        <hr>
+                                <x-admin.badge type="success">
+                                    Actif
+                                </x-admin.badge>
 
-                        <div class="d-flex flex-wrap gap-2">
+                            @else
 
-                            <a
-                                href="{{ route('admin.events.edit', $event) }}"
-                                class="btn btn-sm btn-outline-primary"
-                            >
-                                Modifier
-                            </a>
+                                <x-admin.badge>
+                                    Inactif
+                                </x-admin.badge>
 
-                            <form
-                                method="POST"
-                                action="{{ route('admin.events.destroy', $event) }}"
-                                onsubmit="return confirm(
-                                    'Supprimer définitivement cet événement ?'
-                                );"
-                            >
-                                @csrf
-                                @method('DELETE')
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-sm btn-outline-danger"
-                                >
-                                    Supprimer
-                                </button>
-                            </form>
+                            @endif
 
                         </div>
 
                     </div>
-                </article>
+
+                    <p>
+                        {{ \Illuminate\Support\Str::limit(
+                            $event->description,
+                            180
+                        ) }}
+                    </p>
+
+                    <hr>
+
+                    <div class="row text-center mb-4">
+
+                        <div class="col-4">
+
+                            <div class="fw-bold fs-4">
+                                {{ $event->sessions_count }}
+                            </div>
+
+                            <small class="text-muted">
+                                Session{{ $event->sessions_count > 1 ? 's' : '' }}
+                            </small>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="fw-bold fs-4">
+                                {{ $event->sessions->sum('capacity') }}
+                            </div>
+
+                            <small class="text-muted">
+                                Places
+                            </small>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="fw-bold fs-4">
+                                {{ $event->sessions->sum(
+                                    fn ($session) =>
+                                        $session->participants->count()
+                                ) }}
+                            </div>
+
+                            <small class="text-muted">
+                                Inscrits
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <a
+                            href="{{ route(
+                                'admin.events.sessions.index',
+                                $event
+                            ) }}"
+                            class="btn btn-na-gold"
+                        >
+                            Sessions
+                        </a>
+
+                        <a
+                            href="{{ route(
+                                'admin.events.edit',
+                                $event
+                            ) }}"
+                            class="btn btn-outline-primary"
+                        >
+                            Modifier
+                        </a>
+
+                        <a
+                            href="{{ route(
+                                'admin.events.duplicate.form',
+                                $event
+                            ) }}"
+                            class="btn btn-outline-dark"
+                        >
+                            Dupliquer
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{{ route(
+                                'admin.events.destroy',
+                                $event
+                            ) }}"
+                            onsubmit="return confirm(
+                                'Supprimer définitivement cet événement ?'
+                            );"
+                        >
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger"
+                            >
+                                Supprimer
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </x-admin.card>
+
             </div>
 
         @endforeach

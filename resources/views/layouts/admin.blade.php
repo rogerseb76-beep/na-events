@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
     <title>@yield('title', 'Administration') - NA Events</title>
 
@@ -11,15 +15,20 @@
         'resources/css/app.css',
         'resources/js/app.js'
     ])
+
+    <link
+        rel="stylesheet"
+        href="{{ asset('css/admin-theme.css') }}"
+    >
 </head>
 
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark na-navbar">
     <div class="container">
 
         <a
-            class="navbar-brand fw-bold text-warning"
+            class="navbar-brand"
             href="{{ route('admin.dashboard') }}"
         >
             NORMANDIE ARCHERIE
@@ -37,8 +46,10 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="adminNavbar">
-
+        <div
+            class="collapse navbar-collapse"
+            id="adminNavbar"
+        >
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
@@ -49,15 +60,15 @@
                         Tableau de bord
                     </a>
                 </li>
-                <li class="nav-item">
-    <a
-        class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}"
-        href="{{ route('admin.events.index') }}"
-    >
-        Événements
-    </a>
-</li>
 
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.events.*') ? 'active' : '' }}"
+                        href="{{ route('admin.events.index') }}"
+                    >
+                        Événements
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a
@@ -65,6 +76,15 @@
                         href="{{ route('admin.participants') }}"
                     >
                         Participants
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
+                        class="nav-link {{ request()->routeIs('admin.exports.*') ? 'active' : '' }}"
+                        href="{{ route('admin.exports.index') }}"
+                    >
+                        Exports
                     </a>
                 </li>
 
@@ -88,7 +108,10 @@
                         {{ auth()->user()->name }}
                     </span>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form
+                        method="POST"
+                        action="{{ route('logout') }}"
+                    >
                         @csrf
 
                         <button
@@ -101,7 +124,6 @@
 
                 </div>
             @endauth
-
         </div>
 
     </div>

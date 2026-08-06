@@ -3,33 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Event;
+use App\Services\DashboardService;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $event = Event::with('sessions.participants')->firstOrFail();
-
-        $sessions = $event->sessions;
-
-        $totalParticipants = $sessions->sum(
-            fn ($session) => $session->participants->count()
+    public function index(
+        DashboardService $dashboardService
+    ): View {
+        return view(
+            'admin.dashboard',
+            $dashboardService->data()
         );
-
-        $totalCapacity = $sessions->sum('capacity');
-
-        $remainingPlaces = max(
-            0,
-            $totalCapacity - $totalParticipants
-        );
-
-        return view('admin.dashboard', compact(
-            'event',
-            'sessions',
-            'totalParticipants',
-            'totalCapacity',
-            'remainingPlaces'
-        ));
     }
 }

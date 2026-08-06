@@ -1,25 +1,27 @@
 @extends('layouts.app')
 
-@section('title', 'Journée UUKHA')
+@section('title', $event->title)
 
 @section('content')
 
-<header class="site-header">
-    <div class="container header-inner">
+<header class="public-header">
+    <div class="container public-header-inner">
 
-        <div class="logo-box">
+        <div class="public-logo-frame">
             <img
                 src="{{ asset('images/logos/normandie-archerie.png') }}"
-                alt="Logo Normandie Archerie"
-                class="brand-logo brand-logo-na"
+                alt="Normandie Archerie"
+                class="public-logo public-logo-na"
             >
         </div>
 
-        <div class="logo-box">
+        <div class="public-logo-separator"></div>
+
+        <div class="public-logo-frame">
             <img
                 src="{{ asset('images/logos/uukha.png') }}"
-                alt="Logo UUKHA"
-                class="brand-logo brand-logo-uukha"
+                alt="UUKHA"
+                class="public-logo public-logo-uukha"
             >
         </div>
 
@@ -28,47 +30,60 @@
 
 <main>
 
-@if(session('success'))
-    <div class="container pt-4">
-        <div class="alert alert-success text-center">
-            {{ session('success') }}
+    @if(session('success'))
+        <div class="container pt-4">
+            <div class="alert alert-success text-center">
+                {{ session('success') }}
+            </div>
         </div>
-    </div>
-@endif
+    @endif
 
-    <section class="hero">
-        <div class="container text-center">
+    <section class="public-hero">
+        <div class="container">
 
-            <p class="event-label">NORMANDIE ARCHERIE PRÉSENTE</p>
+            <div class="public-hero-content">
 
-            <h1 class="display-4 fw-bold">
-                {{ $event->title }}
-            </h1>
+                <p class="public-overline">
+                    NORMANDIE ARCHERIE PRÉSENTE
+                </p>
 
-            <p class="event-date">
-                {{ $event->event_date->translatedFormat('l j F Y') }}
-            </p>
+                <h1 class="public-title">
+                    {{ $event->title }}
+                </h1>
 
-            <p class="lead mx-auto event-intro">
-                {{ $event->description }}
-            </p>
+                <p class="public-date">
+                    {{ $event->event_date->translatedFormat('l j F Y') }}
+                </p>
 
-           <a href="#sessions" class="btn btn-na btn-lg px-4">
-    Réserver gratuitement
-</a>
+                <p class="public-description">
+                    {{ $event->description }}
+                </p>
+
+                <a href="#sessions" class="btn public-primary-button">
+                    Réserver gratuitement
+                </a>
+
+            </div>
 
         </div>
     </section>
 
-    <section id="sessions" class="py-5">
+    <section id="sessions" class="public-sessions">
         <div class="container">
 
-            <div class="text-center mb-5">
-                <h2 class="section-title">Choisissez votre session</h2>
-                <p>12 participants maximum par créneau.</p>
+            <div class="public-section-heading">
+                <p class="public-overline">CRÉNEAUX</p>
+
+                <h2>
+                    Choisissez votre session
+                </h2>
+
+                <p>
+                    Sélectionnez le créneau qui vous convient.
+                </p>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
 
                 @forelse($event->sessions as $session)
 
@@ -76,59 +91,92 @@
                         $reserved = $session->capacity - $session->remaining_places;
 
                         $percentage = $session->capacity > 0
-                            ? ($reserved / $session->capacity) * 100
+                            ? round(($reserved / $session->capacity) * 100)
                             : 0;
                     @endphp
 
-                    <div class="col-md-4">
-                        <div class="card card-session h-100 shadow-sm">
-                            <div class="card-body text-center p-4">
+                    <div class="col-md-6 col-lg-4">
 
-                                <p class="session-number">
+                        <article class="public-session-card">
+
+                            <div class="public-session-top">
+
+                                <p class="public-session-name">
                                     {{ strtoupper($session->title) }}
                                 </p>
 
-                                <h3>
-                                    {{ substr($session->start_time, 0, 5) }}
-                                    –
-                                    {{ substr($session->end_time, 0, 5) }}
-                                </h3>
-
-                                <p class="places">
-                                    @if($session->is_full)
-                                        Complet
-                                    @else
-                                        {{ $session->remaining_places }}
-                                        {{ $session->remaining_places > 1 ? 'places restantes' : 'place restante' }}
-                                    @endif
-                                </p>
-
-                                <div class="progress mb-4">
-                                    <div
-                                        class="progress-bar"
-                                        role="progressbar"
-                                        style="width: {{ $percentage }}%"
-                                        aria-valuenow="{{ $percentage }}"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"
-                                    ></div>
-                                </div>
-
                                 @if($session->is_full)
-                                    <button class="btn btn-secondary w-100" disabled>
+                                    <span class="public-session-status is-full">
                                         Complet
-                                    </button>
+                                    </span>
+                                @elseif($session->remaining_places <= 3)
+                                    <span class="public-session-status is-warning">
+                                        Presque complet
+                                    </span>
                                 @else
-                                    <a
-    href="{{ route('reservations.create', $session) }}"
-    class="btn btn-na w-100"
->
-    Réserver ce créneau
-</a>
+                                    <span class="public-session-status is-available">
+                                        Disponible
+                                    </span>
                                 @endif
 
                             </div>
-                        </div>
+
+                            <h3 class="public-session-time">
+                                {{ substr($session->start_time, 0, 5) }}
+                                <span>—</span>
+                                {{ substr($session->end_time, 0, 5) }}
+                            </h3>
+
+                            <p class="public-session-places">
+                                @if($session->is_full)
+                                    Plus aucune place disponible
+                                @else
+                                    {{ $session->remaining_places }}
+                                    {{ $session->remaining_places > 1
+                                        ? 'places restantes'
+                                        : 'place restante'
+                                    }}
+                                @endif
+                            </p>
+
+                            <div class="progress public-progress">
+                                <div
+                                    class="progress-bar"
+                                    role="progressbar"
+                                    style="width: {{ $percentage }}%"
+                                    aria-valuenow="{{ $percentage }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+
+                            <p class="public-progress-caption">
+                                {{ $percentage }} % rempli
+                            </p>
+
+                            @if($session->is_full)
+
+                                <button
+                                    type="button"
+                                    class="btn public-disabled-button w-100"
+                                    disabled
+                                >
+                                    Session complète
+                                </button>
+
+                            @else
+
+                                <a
+                                    href="{{ route('reservations.create', $session) }}"
+                                    class="btn public-session-button w-100"
+                                >
+                                    Réserver ce créneau
+                                </a>
+
+                            @endif
+
+                        </article>
+
                     </div>
 
                 @empty
@@ -142,37 +190,57 @@
                 @endforelse
 
             </div>
+
         </div>
     </section>
 
-    <section class="location-section py-5">
-        <div class="container text-center">
+    <section class="public-location">
+        <div class="container">
 
-            <h2 class="section-title">Informations pratiques</h2>
+            <div class="public-location-card">
 
-            <p class="mt-4">
-                <strong>Normandie Archerie</strong><br>
-                63 Boulevard Charles de Gaulle<br>
-                Actipôle des Chartreux<br>
-                76140 Le Petit-Quevilly
-            </p>
+                <div>
+                    <p class="public-overline">INFORMATIONS PRATIQUES</p>
 
-            <a
-                href="https://www.google.com/maps/search/?api=1&query=63+Boulevard+Charles+de+Gaulle+76140+Le+Petit-Quevilly"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-outline-dark"
-            >
-                Calculer mon itinéraire
-            </a>
+                    <h2>
+                        Normandie Archerie
+                    </h2>
+
+                    <p class="public-address">
+                        63 Boulevard Charles de Gaulle<br>
+                        Actipôle des Chartreux<br>
+                        76140 Le Petit-Quevilly
+                    </p>
+                </div>
+
+                <a
+                    href="https://www.google.com/maps/search/?api=1&query=63+Boulevard+Charles+de+Gaulle+76140+Le+Petit-Quevilly"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn public-outline-button"
+                >
+                    Calculer mon itinéraire
+                </a>
+
+            </div>
 
         </div>
     </section>
 
 </main>
 
-<footer class="bg-dark text-white text-center py-4">
-    © 2026 Normandie Archerie
+<footer class="public-footer">
+    <div class="container public-footer-inner">
+
+        <p>
+            © 2026 Normandie Archerie
+        </p>
+
+        <p>
+            NA Events
+        </p>
+
+    </div>
 </footer>
 
 @endsection

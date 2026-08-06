@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SaveEventRequest;
 use App\Models\Event;
+use App\Services\EventService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class EventController extends Controller
@@ -14,6 +14,12 @@ class EventController extends Controller
     public function index(): View
     {
         $events = Event::query()
+            ->with([
+                'sessions' => fn ($query) => $query
+                    ->with('participants')
+                    ->orderBy('display_order')
+                    ->orderBy('start_time'),
+            ])
             ->withCount('sessions')
             ->orderByDesc('event_date')
             ->get();
@@ -26,18 +32,15 @@ class EventController extends Controller
         return view('admin.events.create');
     }
 
-    public function store(Request $request): RedirectResponse
-    {
-        $validated = $this->validateEvent($request);
-
-        $validated['slug'] = $this->makeUniqueSlug(
-            $validated['title'],
-            $validated['event_date']
-        );
+    public function store(
+        SaveEventRequest $request,
+        EventService $eventService
+    ): RedirectResponse {
+        $validated = $request->validated();
 
         $validated['is_active'] = $request->boolean('is_active');
 
-        Event::create($validated);
+        $eventService->create($validated);
 
         return redirect()
             ->route('admin.events.index')
@@ -49,34 +52,85 @@ class EventController extends Controller
         return view('admin.events.edit', compact('event'));
     }
 
-    public function update(Request $request, Event $event): RedirectResponse
-    {
-        $validated = $this->validateEvent($request);
+    public function update(
+        SaveEventRequest $request,
+        Event $event,
+        EventService $eventService
+    ): RedirectResponse {
+        $validated = $request->validated();
 
-        $newSlug = Str::slug(
-            $validated['title'].'-'.$validated['event_date']
-        );
+        $hasParticipants = $event
+            ->sessions()
+            ->whereHas('participants')
+            ->exists();
 
-        if ($newSlug !== $event->slug) {
-            $validated['slug'] = $this->makeUniqueSlug(
-                $validated['title'],
-                $validated['event_date'],
-                $event->id
-            );
+        $newDate = $validated['event_date'];
+        $currentDate = $event->event_date->format('Y-m-d');
+
+        if ($hasParticipants && $newDate !== $currentDate) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'event_date' =>
+                        'La date d’un événement contenant déjà des participants ne peut pas être modifiée.',
+                ]);
         }
 
         $validated['is_active'] = $request->boolean('is_active');
 
-        $event->update($validated);
+        $eventService->update($event, $validated);
 
         return redirect()
             ->route('admin.events.index')
             ->with('success', 'L’événement a bien été modifié.');
     }
 
+    public function duplicateForm(Event $event): View
+    {
+        $event->load([
+            'sessions' => fn ($query) => $query
+                ->orderBy('display_order')
+                ->orderBy('start_time'),
+        ]);
+
+        return view('admin.events.duplicate', compact('event'));
+    }
+
+    public function duplicateStore(
+        SaveEventRequest $request,
+        Event $event,
+        EventService $eventService
+    ): RedirectResponse {
+        $validated = $request->validated();
+
+        $validated['is_active'] = $request->boolean('is_active');
+
+        $copy = $eventService->duplicate(
+            $event,
+            $validated
+        );
+
+        return redirect()
+            ->route('admin.events.edit', $copy)
+            ->with(
+                'success',
+                'L’événement et ses sessions ont été dupliqués.'
+            );
+    }
+
     public function destroy(Event $event): RedirectResponse
     {
-        $hasParticipants = $event->sessions()
+        if ($event->is_active) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with(
+                    'error',
+                    'Un événement actif ne peut pas être supprimé. Désactivez-le d’abord.'
+                );
+        }
+
+        $hasParticipants = $event
+            ->sessions()
             ->whereHas('participants')
             ->exists();
 
@@ -94,40 +148,5 @@ class EventController extends Controller
         return redirect()
             ->route('admin.events.index')
             ->with('success', 'L’événement a bien été supprimé.');
-    }
-
-    private function validateEvent(Request $request): array
-    {
-        return $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'event_date' => ['required', 'date'],
-            'location' => ['required', 'string', 'max:255'],
-        ]);
-    }
-
-    private function makeUniqueSlug(
-        string $title,
-        string $eventDate,
-        ?int $ignoredEventId = null
-    ): string {
-        $baseSlug = Str::slug($title.'-'.$eventDate);
-        $slug = $baseSlug;
-        $counter = 2;
-
-        while (
-            Event::query()
-                ->when(
-                    $ignoredEventId,
-                    fn ($query) => $query->whereKeyNot($ignoredEventId)
-                )
-                ->where('slug', $slug)
-                ->exists()
-        ) {
-            $slug = $baseSlug.'-'.$counter;
-            $counter++;
-        }
-
-        return $slug;
     }
 }

@@ -519,4 +519,84 @@
     border-radius: 50%;
     font-size: 0.72rem;
     font-weight: 800;
+}.logo-box {
+    width: 220px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.brand-logo-na {
+    max-width: 200px;
+}
+
+.brand-logo-uukha {
+    max-width: 170px;
+}/* ===== HEADER PUBLIC ===== */
+
+.site-header {
+    padding: 30px 0;
+    background: #ffffff;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    flex-wrap: wrap;
+}
+
+.logo-box {
+    width: 220px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.brand-logo-na {
+    height: 105px;
+    width: auto;
+}
+
+.brand-logo-uukha {
+    height: 70px;
+    width: auto;
+}
+
+@media (max-width: 768px) {
+
+    .header-inner {
+        gap: 30px;
+    }
+
+    .logo-box {
+        width: 170px;
+        height: 90px;
+    }
+
+    .brand-logo-na {
+        height: 80px;
+    }
+
+    .brand-logo-uukha {
+        height: 55px;
+    }
 }

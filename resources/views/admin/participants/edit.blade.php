@@ -1,213 +1,312 @@
 @extends('layouts.admin')
 
-@section('title', 'Modifier un participant')
+@section('title', 'Tableau de bord')
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <p class="dashboard-kicker mb-1">ADMINISTRATION</p>
+<div class="dashboard-hero">
 
-        <h1 class="h2 mb-0">
-            Modifier un participant
+    <div>
+
+        <p class="dashboard-kicker">
+            ADMINISTRATION
+        </p>
+
+        <h1 class="dashboard-title">
+            {{ $event->title }}
         </h1>
+
+        <p class="dashboard-date">
+            {{ $event->event_date->translatedFormat('l j F Y') }}
+        </p>
+
     </div>
 
-    <a
-        href="{{ route('admin.participants') }}"
-        class="btn btn-outline-dark"
-    >
-        Retour à la liste
-    </a>
+    <div>
+        <a
+            href="{{ route('admin.events.index') }}"
+            class="btn btn-na-primary"
+        >
+            Gérer les événements
+        </a>
+    </div>
+
 </div>
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>Merci de corriger les erreurs suivantes :</strong>
+<div class="row g-4 mb-5">
 
-        <ul class="mb-0 mt-2">
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+    <div class="col-lg-3 col-md-6">
+
+        <div class="dashboard-stat">
+
+            <div class="dashboard-stat-icon">
+                👥
+            </div>
+
+            <div>
+
+                <span class="dashboard-stat-label">
+                    Participants
+                </span>
+
+                <strong class="dashboard-stat-number">
+                    {{ $totalParticipants }}
+                </strong>
+
+                <span class="dashboard-stat-caption">
+                    inscrits
+                </span>
+
+            </div>
+
+        </div>
+
     </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="dashboard-stat">
+
+            <div class="dashboard-stat-icon">
+                🎯
+            </div>
+
+            <div>
+
+                <span class="dashboard-stat-label">
+                    Taux de remplissage
+                </span>
+
+                <strong class="dashboard-stat-number">
+                    {{ $fillRate }} %
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="dashboard-stat">
+
+            <div class="dashboard-stat-icon">
+                🪑
+            </div>
+
+            <div>
+
+                <span class="dashboard-stat-label">
+                    Places restantes
+                </span>
+
+                <strong class="dashboard-stat-number">
+                    {{ $remainingPlaces }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+
+        <div class="dashboard-stat">
+
+            <div class="dashboard-stat-icon">
+                ⛔
+            </div>
+
+            <div>
+
+                <span class="dashboard-stat-label">
+                    Sessions complètes
+                </span>
+
+                <strong class="dashboard-stat-number">
+                    {{ $fullSessions }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="dashboard-section-header">
+
+    <h2>
+        Sessions
+    </h2>
+
+</div>
+
+<div class="row g-4">
+
+@foreach($sessions as $session)
+
+@php
+
+$percentage = $session->capacity > 0
+? round(($session->participants_count / $session->capacity) * 100)
+: 0;
+
+@endphp
+
+<div class="col-lg-4">
+
+<div class="dashboard-session">
+
+<div class="dashboard-session-header">
+
+<div>
+
+<p class="dashboard-session-name">
+{{ strtoupper($session->title) }}
+</p>
+
+<h3>
+{{ substr($session->start_time,0,5) }}
+—
+{{ substr($session->end_time,0,5) }}
+</h3>
+
+</div>
+
+@if($session->participants_count >= $session->capacity)
+
+<span class="session-status session-status-full">
+COMPLET
+</span>
+
+@elseif($session->participants_count >= ($session->capacity-3))
+
+<span class="session-status session-status-warning">
+BIENTÔT COMPLET
+</span>
+
+@else
+
+<span class="session-status session-status-available">
+DISPONIBLE
+</span>
+
 @endif
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
+</div>
 
-        <form
-            method="POST"
-            action="{{ route('admin.participants.update', $participant) }}"
-        >
-            @csrf
-            @method('PUT')
+<div class="dashboard-session-count">
 
-            <div class="row g-3">
+<div>
 
-                <div class="col-md-6">
-                    <label for="lastname" class="form-label">
-                        Nom
-                    </label>
+<strong>
+{{ $session->participants_count }}
+</strong>
 
-                    <input
-                        type="text"
-                        id="lastname"
-                        name="lastname"
-                        class="form-control @error('lastname') is-invalid @enderror"
-                        value="{{ old('lastname', $participant->lastname) }}"
-                        required
-                    >
+<br>
 
-                    @error('lastname')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+<span>
+participants
+</span>
 
-                <div class="col-md-6">
-                    <label for="firstname" class="form-label">
-                        Prénom
-                    </label>
+</div>
 
-                    <input
-                        type="text"
-                        id="firstname"
-                        name="firstname"
-                        class="form-control @error('firstname') is-invalid @enderror"
-                        value="{{ old('firstname', $participant->firstname) }}"
-                        required
-                    >
+<div>
 
-                    @error('firstname')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+<strong>
+{{ $session->capacity }}
+</strong>
 
-                <div class="col-md-6">
-                    <label for="email" class="form-label">
-                        Adresse e-mail
-                    </label>
+<br>
 
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="form-control @error('email') is-invalid @enderror"
-                        value="{{ old('email', $participant->email) }}"
-                        required
-                    >
+<span>
+places
+</span>
 
-                    @error('email')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+</div>
 
-                <div class="col-md-6">
-                    <label for="phone" class="form-label">
-                        Téléphone
-                    </label>
+</div>
 
-                    <input
-                        type="text"
-                        id="phone"
-                        name="phone"
-                        class="form-control @error('phone') is-invalid @enderror"
-                        value="{{ old('phone', $participant->phone) }}"
-                    >
+<div class="progress dashboard-progress">
 
-                    @error('phone')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+<div
+class="progress-bar"
+style="width: {{ $percentage }}%"
+></div>
 
-                <div class="col-md-6">
-                    <label for="club" class="form-label">
-                        Club
-                    </label>
+</div>
 
-                    <input
-                        type="text"
-                        id="club"
-                        name="club"
-                        class="form-control @error('club') is-invalid @enderror"
-                        value="{{ old('club', $participant->club) }}"
-                    >
+<p class="dashboard-progress-label">
 
-                    @error('club')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+{{ $percentage }} %
 
-                <div class="col-md-6">
-                    <label for="event_session_id" class="form-label">
-                        Session
-                    </label>
+</p>
 
-                    <select
-                        id="event_session_id"
-                        name="event_session_id"
-                        class="form-select @error('event_session_id') is-invalid @enderror"
-                        required
-                    >
-                        @foreach($sessions as $session)
-                            <option
-                                value="{{ $session->id }}"
-                                @selected(
-                                    old(
-                                        'event_session_id',
-                                        $participant->event_session_id
-                                    ) == $session->id
-                                )
-                            >
-                                {{ $session->title }}
-                                —
-                                {{ substr($session->start_time, 0, 5) }}
-                                à
-                                {{ substr($session->end_time, 0, 5) }}
-                            </option>
-                        @endforeach
-                    </select>
+<div class="dashboard-participants">
 
-                    @error('event_session_id')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
+@forelse($session->participants as $participant)
 
-            </div>
+<div class="dashboard-participant">
 
-            <hr class="my-4">
+<div class="participant-initials">
 
-            <div class="d-flex justify-content-end gap-2">
-                <a
-                    href="{{ route('admin.participants') }}"
-                    class="btn btn-secondary"
-                >
-                    Annuler
-                </a>
+{{ strtoupper(substr($participant->firstname,0,1)) }}{{ strtoupper(substr($participant->lastname,0,1)) }}
 
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                >
-                    Enregistrer les modifications
-                </button>
-            </div>
+</div>
 
-        </form>
+<div>
 
-    </div>
+<strong>
+
+{{ $participant->firstname }}
+{{ $participant->lastname }}
+
+</strong>
+
+<small>
+
+{{ $participant->club ?: 'Sans club' }}
+
+</small>
+
+</div>
+
+</div>
+
+@empty
+
+<p class="dashboard-empty">
+
+Aucun participant.
+
+</p>
+
+@endforelse
+
+@if($session->participants_count > 5)
+
+<p class="dashboard-more">
+
++ {{ $session->participants_count - 5 }}
+
+participant(s)
+
+</p>
+
+@endif
+
+</div>
+
+</div>
+
+</div>
+
+@endforeach
+
 </div>
 
 @endsection

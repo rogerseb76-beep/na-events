@@ -1,0 +1,372 @@
+:root {
+    --na-black: #171717;
+    --na-black-soft: #242424;
+    --na-gold: #c9a646;
+    --na-gold-dark: #9d761d;
+    --na-gold-light: #f5edd9;
+    --na-background: #f6f6f4;
+    --na-surface: #ffffff;
+    --na-border: #e9e4d8;
+    --na-text: #1c1c1c;
+    --na-muted: #747474;
+    --na-success: #237a46;
+    --na-success-bg: #e9f6ee;
+    --na-warning: #8b6200;
+    --na-warning-bg: #fff3d2;
+    --na-danger: #a52a2a;
+    --na-danger-bg: #fdeaea;
+    --na-radius-sm: 10px;
+    --na-radius: 18px;
+    --na-radius-lg: 24px;
+    --na-shadow: 0 12px 35px rgba(0, 0, 0, 0.07);
+}
+
+body {
+    background: var(--na-background);
+    color: var(--na-text);
+}
+
+/* Barre de navigation */
+
+.na-navbar {
+    background: var(--na-black);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.18);
+}
+
+.na-navbar .navbar-brand {
+    color: var(--na-gold);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.na-navbar .navbar-brand:hover {
+    color: #efd47d;
+}
+
+.na-navbar .nav-link {
+    color: #d8d8d8;
+    border-radius: 8px;
+    padding-right: 0.8rem;
+    padding-left: 0.8rem;
+}
+
+.na-navbar .nav-link:hover,
+.na-navbar .nav-link.active {
+    background: rgba(201, 166, 70, 0.14);
+    color: var(--na-gold);
+}
+
+/* Titres */
+
+.na-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.na-eyebrow {
+    margin-bottom: 0.4rem;
+    color: var(--na-gold-dark);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+}
+
+.na-page-title {
+    margin-bottom: 0.35rem;
+    color: var(--na-black);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+}
+
+.na-page-subtitle {
+    margin-bottom: 0;
+    color: var(--na-muted);
+}
+
+/* Cartes */
+
+.na-card {
+    background: var(--na-surface);
+    border: 1px solid var(--na-border);
+    border-radius: var(--na-radius);
+    box-shadow: var(--na-shadow);
+}
+
+.na-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--na-border);
+}
+
+.na-card-body {
+    padding: 1.5rem;
+}
+
+/* Statistiques */
+
+.na-stat-card {
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--na-surface);
+    border: 1px solid var(--na-border);
+    border-radius: var(--na-radius);
+    box-shadow: var(--na-shadow);
+}
+
+.na-stat-icon {
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: var(--na-gold-light);
+    border-radius: 17px;
+    font-size: 1.75rem;
+}
+
+.na-stat-label {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: var(--na-muted);
+    font-size: 0.9rem;
+}
+
+.na-stat-value {
+    display: block;
+    color: var(--na-black);
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.na-stat-caption {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--na-muted);
+    font-size: 0.8rem;
+}
+
+/* Boutons */
+
+.btn-na-primary {
+    border-color: var(--na-black);
+    background: var(--na-black);
+    color: #ffffff;
+}
+
+.btn-na-primary:hover,
+.btn-na-primary:focus {
+    border-color: var(--na-gold-dark);
+    background: var(--na-gold-dark);
+    color: #ffffff;
+}
+
+.btn-na-gold {
+    border-color: var(--na-gold);
+    background: var(--na-gold);
+    color: var(--na-black);
+    font-weight: 700;
+}
+
+.btn-na-gold:hover,
+.btn-na-gold:focus {
+    border-color: var(--na-gold-dark);
+    background: var(--na-gold-dark);
+    color: #ffffff;
+}
+
+/* Badges */
+
+.na-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.na-badge-success {
+    background: var(--na-success-bg);
+    color: var(--na-success);
+}
+
+.na-badge-warning {
+    background: var(--na-warning-bg);
+    color: var(--na-warning);
+}
+
+.na-badge-danger {
+    background: var(--na-danger-bg);
+    color: var(--na-danger);
+}
+
+.na-badge-neutral {
+    background: #eeeeec;
+    color: #555555;
+}
+
+/* Tableaux */
+
+.na-table {
+    margin-bottom: 0;
+}
+
+.na-table thead th {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--na-border);
+    color: var(--na-muted);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.na-table tbody td {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-color: #f0eee9;
+    vertical-align: middle;
+}
+
+.na-table tbody tr:hover {
+    background: #fbfaf7;
+}
+
+/* Formulaires */
+
+.na-form-label {
+    color: var(--na-black);
+    font-weight: 700;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--na-gold);
+    box-shadow: 0 0 0 0.2rem rgba(201, 166, 70, 0.18);
+}
+
+/* Avatars */
+
+.na-avatar {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: var(--na-black);
+    color: #ffffff;
+    border-radius: 50%;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+/* Barre de progression */
+
+.na-progress {
+    height: 10px;
+    overflow: hidden;
+    background: #ece9e0;
+    border-radius: 999px;
+}
+
+.na-progress .progress-bar {
+    background: linear-gradient(
+        90deg,
+        var(--na-gold-dark),
+        var(--na-gold)
+    );
+}
+
+/* Messages */
+
+.alert {
+    border: 0;
+    border-radius: var(--na-radius-sm);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .na-page-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .na-page-header .btn {
+        width: 100%;
+    }
+
+    .na-card-body {
+        padding: 1.1rem;
+    }
+}
+/* ==========================================================
+   STAT CARD
+========================================================== */
+
+.na-stat-icon{
+    width:60px;
+    height:60px;
+
+    border-radius:16px;
+
+    background:#c9a227;
+
+    color:#fff;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:28px;
+
+    flex-shrink:0;
+}
+
+.na-stat-success{
+    background:#198754;
+}
+
+.na-stat-warning{
+    background:#fd7e14;
+}
+
+.na-stat-danger{
+    background:#dc3545;
+}
+
+.na-stat-label{
+
+    font-size:.82rem;
+
+    text-transform:uppercase;
+
+    color:#777;
+
+    letter-spacing:.08em;
+}
+
+.na-stat-value{
+
+    font-size:2rem;
+
+    font-weight:700;
+
+    line-height:1.1;
+
+    color:#222;
+}
+
+.na-stat-caption{
+
+    color:#888;
+
+    font-size:.85rem;
+}
