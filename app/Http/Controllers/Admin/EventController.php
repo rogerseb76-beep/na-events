@@ -24,7 +24,10 @@ class EventController extends Controller
             ->orderByDesc('event_date')
             ->get();
 
-        return view('admin.events.index', compact('events'));
+        return view(
+            'admin.events.index',
+            compact('events')
+        );
     }
 
     public function create(): View
@@ -36,20 +39,24 @@ class EventController extends Controller
         SaveEventRequest $request,
         EventService $eventService
     ): RedirectResponse {
-        $validated = $request->validated();
-
-        $validated['is_active'] = $request->boolean('is_active');
-
-        $eventService->create($validated);
+        $eventService->create(
+            $request->validated()
+        );
 
         return redirect()
             ->route('admin.events.index')
-            ->with('success', 'L’événement a bien été créé.');
+            ->with(
+                'success',
+                'L’événement a bien été créé.'
+            );
     }
 
     public function edit(Event $event): View
     {
-        return view('admin.events.edit', compact('event'));
+        return view(
+            'admin.events.edit',
+            compact('event')
+        );
     }
 
     public function update(
@@ -65,9 +72,15 @@ class EventController extends Controller
             ->exists();
 
         $newDate = $validated['event_date'];
-        $currentDate = $event->event_date->format('Y-m-d');
 
-        if ($hasParticipants && $newDate !== $currentDate) {
+        $currentDate = $event
+            ->event_date
+            ->format('Y-m-d');
+
+        if (
+            $hasParticipants
+            && $newDate !== $currentDate
+        ) {
             return back()
                 ->withInput()
                 ->withErrors([
@@ -76,24 +89,32 @@ class EventController extends Controller
                 ]);
         }
 
-        $validated['is_active'] = $request->boolean('is_active');
-
-        $eventService->update($event, $validated);
+        $eventService->update(
+            $event,
+            $validated
+        );
 
         return redirect()
             ->route('admin.events.index')
-            ->with('success', 'L’événement a bien été modifié.');
+            ->with(
+                'success',
+                'L’événement a bien été modifié.'
+            );
     }
 
-    public function duplicateForm(Event $event): View
-    {
+    public function duplicateForm(
+        Event $event
+    ): View {
         $event->load([
             'sessions' => fn ($query) => $query
                 ->orderBy('display_order')
                 ->orderBy('start_time'),
         ]);
 
-        return view('admin.events.duplicate', compact('event'));
+        return view(
+            'admin.events.duplicate',
+            compact('event')
+        );
     }
 
     public function duplicateStore(
@@ -101,13 +122,9 @@ class EventController extends Controller
         Event $event,
         EventService $eventService
     ): RedirectResponse {
-        $validated = $request->validated();
-
-        $validated['is_active'] = $request->boolean('is_active');
-
         $copy = $eventService->duplicate(
             $event,
-            $validated
+            $request->validated()
         );
 
         return redirect()
@@ -118,20 +135,21 @@ class EventController extends Controller
             );
     }
 
-    public function destroy(Event $event): RedirectResponse
-    {
-        if ($event->is_active) {
+    public function destroy(
+        Event $event
+    ): RedirectResponse {
+        if ($event->isPubliclyVisible()) {
             return redirect()
                 ->route('admin.events.index')
                 ->with(
                     'error',
-                    'Un événement actif ne peut pas être supprimé. Désactivez-le d’abord.'
+                    'Un événement visible publiquement ne peut pas être supprimé. Passez-le d’abord en brouillon, clos ou archivé.'
                 );
         }
 
         $hasParticipants = $event
             ->sessions()
-            ->whereHas('participants')
+            ->whereHas('allParticipants')
             ->exists();
 
         if ($hasParticipants) {
@@ -147,6 +165,9 @@ class EventController extends Controller
 
         return redirect()
             ->route('admin.events.index')
-            ->with('success', 'L’événement a bien été supprimé.');
+            ->with(
+                'success',
+                'L’événement a bien été supprimé.'
+            );
     }
 }

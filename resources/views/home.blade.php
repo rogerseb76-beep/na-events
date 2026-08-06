@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $event->title)
+@section('title', 'Inscriptions aux événements')
 
 @section('content')
 
@@ -12,16 +12,6 @@
                 src="{{ asset('images/logos/normandie-archerie.png') }}"
                 alt="Normandie Archerie"
                 class="public-logo public-logo-na"
-            >
-        </div>
-
-        <div class="public-logo-separator"></div>
-
-        <div class="public-logo-frame">
-            <img
-                src="{{ asset('images/logos/uukha.png') }}"
-                alt="UUKHA"
-                class="public-logo public-logo-uukha"
             >
         </div>
 
@@ -38,191 +28,172 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="container pt-4">
+            <div class="alert alert-danger text-center">
+                {{ session('error') }}
+            </div>
+        </div>
+    @endif
+
     <section class="public-hero">
         <div class="container">
-
             <div class="public-hero-content">
 
                 <p class="public-overline">
-                    NORMANDIE ARCHERIE PRÉSENTE
+                    NORMANDIE ARCHERIE
                 </p>
 
                 <h1 class="public-title">
-                    {{ $event->title }}
+                    Inscriptions aux événements
                 </h1>
 
-                <p class="public-date">
-                    {{ $event->event_date->translatedFormat('l j F Y') }}
-                </p>
-
                 <p class="public-description">
-                    {{ $event->description }}
+                    Retrouvez les événements actuellement ouverts
+                    et choisissez le créneau qui vous convient.
                 </p>
 
-                <a href="#sessions" class="btn public-primary-button">
-                    Réserver gratuitement
-                </a>
+                @if($registrationState !== 'open')
+                    <div class="alert alert-warning mt-4 mb-0">
+                        {{ $registrationMessage }}
+                    </div>
+                @endif
 
             </div>
-
         </div>
     </section>
 
-    <section id="sessions" class="public-sessions">
+    <section class="public-sessions">
         <div class="container">
 
             <div class="public-section-heading">
-                <p class="public-overline">CRÉNEAUX</p>
+                <p class="public-overline">
+                    ÉVÉNEMENTS
+                </p>
 
                 <h2>
-                    Choisissez votre session
+                    Événements disponibles
                 </h2>
-
-                <p>
-                    Sélectionnez le créneau qui vous convient.
-                </p>
             </div>
 
-            <div class="row g-4 justify-content-center">
+            @if($events->isEmpty())
 
-                @forelse($event->sessions as $session)
-
-                    @php
-                        $reserved = $session->capacity - $session->remaining_places;
-
-                        $percentage = $session->capacity > 0
-                            ? round(($reserved / $session->capacity) * 100)
-                            : 0;
-                    @endphp
-
-                    <div class="col-md-6 col-lg-4">
-
-                        <article class="public-session-card">
-
-                            <div class="public-session-top">
-
-                                <p class="public-session-name">
-                                    {{ strtoupper($session->title) }}
-                                </p>
-
-                                @if($session->is_full)
-                                    <span class="public-session-status is-full">
-                                        Complet
-                                    </span>
-                                @elseif($session->remaining_places <= 3)
-                                    <span class="public-session-status is-warning">
-                                        Presque complet
-                                    </span>
-                                @else
-                                    <span class="public-session-status is-available">
-                                        Disponible
-                                    </span>
-                                @endif
-
-                            </div>
-
-                            <h3 class="public-session-time">
-                                {{ substr($session->start_time, 0, 5) }}
-                                <span>—</span>
-                                {{ substr($session->end_time, 0, 5) }}
-                            </h3>
-
-                            <p class="public-session-places">
-                                @if($session->is_full)
-                                    Plus aucune place disponible
-                                @else
-                                    {{ $session->remaining_places }}
-                                    {{ $session->remaining_places > 1
-                                        ? 'places restantes'
-                                        : 'place restante'
-                                    }}
-                                @endif
-                            </p>
-
-                            <div class="progress public-progress">
-                                <div
-                                    class="progress-bar"
-                                    role="progressbar"
-                                    style="width: {{ $percentage }}%"
-                                    aria-valuenow="{{ $percentage }}"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100"
-                                ></div>
-                            </div>
-
-                            <p class="public-progress-caption">
-                                {{ $percentage }} % rempli
-                            </p>
-
-                            @if($session->is_full)
-
-                                <button
-                                    type="button"
-                                    class="btn public-disabled-button w-100"
-                                    disabled
-                                >
-                                    Session complète
-                                </button>
-
-                            @else
-
-                                <a
-                                    href="{{ route('reservations.create', $session) }}"
-                                    class="btn public-session-button w-100"
-                                >
-                                    Réserver ce créneau
-                                </a>
-
-                            @endif
-
-                        </article>
-
-                    </div>
-
-                @empty
-
-                    <div class="col-12">
-                        <div class="alert alert-warning text-center">
-                            Aucun créneau disponible pour le moment.
-                        </div>
-                    </div>
-
-                @endforelse
-
-            </div>
-
-        </div>
-    </section>
-
-    <section class="public-location">
-        <div class="container">
-
-            <div class="public-location-card">
-
-                <div>
-                    <p class="public-overline">INFORMATIONS PRATIQUES</p>
-
-                    <h2>
-                        Normandie Archerie
-                    </h2>
-
-                    <p class="public-address">
-                        63 Boulevard Charles de Gaulle<br>
-                        Actipôle des Chartreux<br>
-                        76140 Le Petit-Quevilly
-                    </p>
+                <div class="alert alert-info text-center">
+                    Aucun événement n’est actuellement ouvert
+                    aux inscriptions.
                 </div>
 
-                <a
-                    href="https://www.google.com/maps/search/?api=1&query=63+Boulevard+Charles+de+Gaulle+76140+Le+Petit-Quevilly"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="btn public-outline-button"
-                >
-                    Calculer mon itinéraire
-                </a>
+            @else
 
-            </div>
+                <div class="row g-4">
+
+                    @foreach($events as $event)
+
+                        @php
+                            $totalCapacity =
+                                $event->sessions->sum('capacity');
+
+                            $registered =
+                                $event->sessions->sum(
+                                    'participants_count'
+                                );
+
+                            $remaining = max(
+                                0,
+                                $totalCapacity - $registered
+                            );
+
+                            $percentage =
+                                $totalCapacity > 0
+                                    ? round(
+                                        (
+                                            $registered
+                                            / $totalCapacity
+                                        ) * 100
+                                    )
+                                    : 0;
+                        @endphp
+
+                        <div class="col-lg-6">
+
+                            <article class="public-session-card h-100">
+
+                                <div class="public-session-top">
+
+                                    <p class="public-session-name">
+                                        <x-date-long
+                                            :value="$event->event_date"
+                                            :capitalize="true"
+                                        />
+                                    </p>
+
+                                    <span class="public-session-status {{ $event->status === 'full' ? 'is-full' : 'is-available' }}">
+                                        {{ $event->status === 'full'
+                                            ? 'Liste d’attente'
+                                            : 'Ouvert'
+                                        }}
+                                    </span>
+
+                                </div>
+
+                                <h2 class="h3">
+                                    {{ $event->title }}
+                                </h2>
+
+                                <p class="text-muted">
+                                    {{ $event->location }}
+                                </p>
+
+                                <p>
+                                    {{ \Illuminate\Support\Str::limit(
+                                        $event->description,
+                                        180
+                                    ) }}
+                                </p>
+
+                                <p class="public-session-places">
+                                    {{ $event->sessions->count() }}
+                                    session{{ $event->sessions->count() > 1 ? 's' : '' }}
+                                    —
+                                    {{ $remaining }}
+                                    place{{ $remaining > 1 ? 's' : '' }}
+                                    restante{{ $remaining > 1 ? 's' : '' }}
+                                </p>
+
+                                <div class="progress public-progress">
+                                    <div
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        style="width: {{ $percentage }}%"
+                                        aria-valuenow="{{ $percentage }}"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    ></div>
+                                </div>
+
+                                <p class="public-progress-caption">
+                                    {{ $percentage }} % rempli
+                                </p>
+
+                                <a
+                                    href="{{ route(
+                                        'public.events.show',
+                                        $event
+                                    ) }}"
+                                    class="btn public-session-button w-100"
+                                >
+                                    Voir les créneaux
+                                </a>
+
+                            </article>
+
+                        </div>
+
+                    @endforeach
+
+                </div>
+
+            @endif
 
         </div>
     </section>
@@ -231,15 +202,13 @@
 
 <footer class="public-footer">
     <div class="container public-footer-inner">
-
         <p>
-            © 2026 Normandie Archerie
+            © {{ now()->year }} Normandie Archerie
         </p>
 
         <p>
             NA Events
         </p>
-
     </div>
 </footer>
 

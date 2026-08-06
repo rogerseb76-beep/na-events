@@ -25,7 +25,9 @@ class PdfController extends Controller
         $pdf = Pdf::loadView(
             'admin.pdf.session-attendance',
             compact('event', 'session')
-        )->setPaper('a4', 'portrait');
+        )
+            ->setPaper('a4', 'portrait')
+            ->setOption('isRemoteEnabled', true);
 
         $filename = 'emargement-'
             . $event->slug
@@ -53,7 +55,9 @@ class PdfController extends Controller
         $pdf = Pdf::loadView(
             'admin.pdf.event-attendance',
             compact('event')
-        )->setPaper('a4', 'portrait');
+        )
+            ->setPaper('a4', 'portrait')
+            ->setOption('isRemoteEnabled', true);
 
         $filename = 'emargement-complet-'
             . $event->slug

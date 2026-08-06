@@ -9,7 +9,9 @@
         content="width=device-width, initial-scale=1"
     >
 
-    <title>@yield('title', 'Administration') - NA Events</title>
+    <title>
+        @yield('title', 'Administration') - NA Events
+    </title>
 
     @vite([
         'resources/css/app.css',
@@ -23,6 +25,26 @@
 </head>
 
 <body>
+
+@php
+    $registrationState =
+        \App\Models\AppSetting::registrationState();
+
+    $registrationBadge = match ($registrationState) {
+        'open' => [
+            'class' => 'text-bg-success',
+            'label' => 'Public ouvert',
+        ],
+        'live' => [
+            'class' => 'text-bg-warning',
+            'label' => 'Journée en cours',
+        ],
+        default => [
+            'class' => 'text-bg-danger',
+            'label' => 'Inscriptions fermées',
+        ],
+    };
+@endphp
 
 <nav class="navbar navbar-expand-lg navbar-dark na-navbar">
     <div class="container">
@@ -90,6 +112,15 @@
 
                 <li class="nav-item">
                     <a
+                        class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}"
+                        href="{{ route('admin.settings.edit') }}"
+                    >
+                        Paramètres
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a
                         class="nav-link"
                         href="{{ route('home') }}"
                         target="_blank"
@@ -102,7 +133,11 @@
             </ul>
 
             @auth
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex flex-wrap align-items-center gap-3">
+
+                    <span class="badge {{ $registrationBadge['class'] }}">
+                        {{ $registrationBadge['label'] }}
+                    </span>
 
                     <span class="navbar-text text-light">
                         {{ auth()->user()->name }}

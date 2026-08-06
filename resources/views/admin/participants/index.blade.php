@@ -4,16 +4,20 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <p class="dashboard-kicker mb-1">ADMINISTRATION</p>
-        <h1 class="h2 mb-0">Participants</h1>
-    </div>
-
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-dark">
-        Retour au tableau de bord
-    </a>
-</div>
+<x-admin.page-header
+    eyebrow="ADMINISTRATION"
+    title="Participants"
+    subtitle="Gérez les inscriptions confirmées, les listes d’attente et les présences."
+>
+    <x-slot:actions>
+        <a
+            href="{{ route('admin.dashboard') }}"
+            class="btn btn-outline-dark"
+        >
+            Retour au tableau de bord
+        </a>
+    </x-slot:actions>
+</x-admin.page-header>
 
 @if(session('success'))
     <div class="alert alert-success">
@@ -21,128 +25,339 @@
     </div>
 @endif
 
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-body p-4">
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
+<x-admin.card class="mb-4">
+
+    <form
+        method="GET"
+        action="{{ route('admin.participants') }}"
+    >
 
         <div class="row g-3 align-items-end">
 
-            <div class="col-lg-7">
-                <label for="participant-search" class="form-label">
+            <div class="col-lg-5">
+                <label
+                    for="participant-search"
+                    class="form-label"
+                >
                     Rechercher un participant
                 </label>
 
                 <input
                     type="search"
                     id="participant-search"
+                    name="search"
                     class="form-control"
+                    value="{{ $search ?? request('search') }}"
                     placeholder="Nom, prénom, e-mail ou club"
                 >
             </div>
 
-            <div class="col-lg-5">
-                <label for="session-filter" class="form-label">
-                    Filtrer par session
+            <div class="col-lg-3">
+                <label
+                    for="session-filter"
+                    class="form-label"
+                >
+                    Session
                 </label>
 
-                <select id="session-filter" class="form-select">
-                    <option value="">Toutes les sessions</option>
+                <select
+                    id="session-filter"
+                    name="session_id"
+                    class="form-select"
+                >
+                    <option value="">
+                        Toutes les sessions
+                    </option>
 
                     @foreach($sessions as $session)
-                        <option value="{{ $session->id }}">
+                        <option
+                            value="{{ $session->id }}"
+                            @selected(
+                                (string) (
+                                    $sessionId
+                                    ?? request('session_id')
+                                )
+                                === (string) $session->id
+                            )
+                        >
+                            {{ $session->event?->title }}
+                            —
                             {{ $session->title }}
                             —
                             {{ substr($session->start_time, 0, 5) }}
-                            à
-                            {{ substr($session->end_time, 0, 5) }}
                         </option>
                     @endforeach
                 </select>
             </div>
 
-        </div>
+            <div class="col-lg-2">
+                <label
+                    for="registration-status-filter"
+                    class="form-label"
+                >
+                    Inscription
+                </label>
 
-    </div>
-</div>
+                <select
+                    id="registration-status-filter"
+                    name="registration_status"
+                    class="form-select"
+                >
+                    <option value="">
+                        Tous les statuts
+                    </option>
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
+                    <option
+                        value="confirmed"
+                        @selected(
+                            ($registrationStatus ?? '')
+                            === 'confirmed'
+                        )
+                    >
+                        Confirmés
+                    </option>
 
-        <p class="mb-4">
-            <span id="participant-count">{{ $participants->count() }}</span>
-            participant(s) affiché(s)
-        </p>
+                    <option
+                        value="waiting"
+                        @selected(
+                            ($registrationStatus ?? '')
+                            === 'waiting'
+                        )
+                    >
+                        Liste d’attente
+                    </option>
 
-        @if($participants->isEmpty())
-
-            <div class="alert alert-info mb-0">
-                Aucun participant enregistré.
+                    <option
+                        value="cancelled"
+                        @selected(
+                            ($registrationStatus ?? '')
+                            === 'cancelled'
+                        )
+                    >
+                        Annulés
+                    </option>
+                </select>
             </div>
 
-        @else
+            <div class="col-lg-2 d-grid">
+                <button
+                    type="submit"
+                    class="btn btn-na-primary"
+                >
+                    Filtrer
+                </button>
+            </div>
 
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
+        </div>
+
+        @if(
+            ($search ?? '') !== ''
+            || ! empty($sessionId)
+            || ! empty($registrationStatus)
+        )
+            <div class="mt-3">
+                <a
+                    href="{{ route('admin.participants') }}"
+                    class="btn btn-sm btn-outline-secondary"
+                >
+                    Réinitialiser les filtres
+                </a>
+            </div>
+        @endif
+
+    </form>
+
+</x-admin.card>
+
+<x-admin.card>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <p class="mb-0">
+            <strong>{{ $participants->total() }}</strong>
+            dossier{{ $participants->total() > 1 ? 's' : '' }}
+            affiché{{ $participants->total() > 1 ? 's' : '' }}
+        </p>
+
+        <p class="mb-0 text-muted small">
+            Page {{ $participants->currentPage() }}
+            sur {{ $participants->lastPage() }}
+        </p>
+    </div>
+
+    @if($participants->isEmpty())
+
+        <div class="alert alert-info mb-0">
+            Aucun participant ne correspond aux critères sélectionnés.
+        </div>
+
+    @else
+
+        <div class="table-responsive">
+            <table class="table align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Participant</th>
+                        <th>Session</th>
+                        <th>Inscription</th>
+                        <th class="text-center">Présence</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach($participants as $participant)
+
                         <tr>
-                            <th>Participant</th>
-                            <th>E-mail</th>
-                            <th>Club</th>
-                            <th>Session</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
 
-                    <tbody id="participants-table-body">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
 
-                        @foreach($participants as $participant)
-
-                            <tr
-                                class="participant-row"
-                                data-search="{{ strtolower(
-                                    $participant->lastname . ' ' .
-                                    $participant->firstname . ' ' .
-                                    $participant->email . ' ' .
-                                    ($participant->club ?? '')
-                                ) }}"
-                                data-session="{{ $participant->event_session_id }}"
-                            >
-
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-
-                                        <div class="participant-initials">
-                                            {{ strtoupper(substr($participant->firstname, 0, 1)) }}
-                                            {{ strtoupper(substr($participant->lastname, 0, 1)) }}
-                                        </div>
-
-                                        <div>
-                                            <strong>
-                                                {{ $participant->lastname }}
-                                                {{ $participant->firstname }}
-                                            </strong>
-                                        </div>
-
+                                    <div class="participant-initials">
+                                        {{ strtoupper(substr($participant->firstname, 0, 1)) }}
+                                        {{ strtoupper(substr($participant->lastname, 0, 1)) }}
                                     </div>
-                                </td>
 
-                                <td>
-                                    {{ $participant->email }}
-                                </td>
+                                    <div>
+                                        <strong>
+                                            {{ strtoupper($participant->lastname) }}
+                                            {{ $participant->firstname }}
+                                        </strong>
 
-                                <td>
-                                    {{ $participant->club ?: '—' }}
-                                </td>
+                                        <small class="d-block text-muted">
+                                            {{ $participant->email }}
+                                        </small>
 
-                                <td>
+                                        @if($participant->phone)
+                                            <small class="d-block text-muted">
+                                                {{ $participant->phone }}
+                                            </small>
+                                        @endif
+
+                                        @if($participant->club)
+                                            <small class="d-block text-muted">
+                                                {{ $participant->club }}
+                                            </small>
+                                        @endif
+                                    </div>
+
+                                </div>
+                            </td>
+
+                            <td>
+                                @if($participant->session)
+                                    <strong class="d-block">
+                                        {{ $participant->session->title }}
+                                    </strong>
+
                                     <span class="badge text-bg-dark">
                                         {{ substr($participant->session->start_time, 0, 5) }}
                                         –
                                         {{ substr($participant->session->end_time, 0, 5) }}
                                     </span>
-                                </td>
+                                @else
+                                    <span class="text-muted">
+                                        Session supprimée
+                                    </span>
+                                @endif
+                            </td>
 
-                                <td>
-                                    <div class="d-flex gap-2">
+                            <td>
+                                @switch($participant->registration_status)
+
+                                    @case('confirmed')
+                                        <x-admin.badge type="success">
+                                            Confirmé
+                                        </x-admin.badge>
+                                        @break
+
+                                    @case('waiting')
+                                        <x-admin.badge type="warning">
+                                            Liste d’attente
+                                        </x-admin.badge>
+                                        @break
+
+                                    @case('cancelled')
+                                        <x-admin.badge type="danger">
+                                            Annulé
+                                        </x-admin.badge>
+                                        @break
+
+                                    @default
+                                        <x-admin.badge>
+                                            Non défini
+                                        </x-admin.badge>
+
+                                @endswitch
+                            </td>
+
+                            <td class="text-center">
+                                @if($participant->isConfirmedRegistration())
+
+                                    <x-admin.attendance-badge
+                                        :participant="$participant"
+                                    />
+
+                                    @if($participant->checked_in_at)
+                                        <div class="small text-muted mt-1">
+                                            Pointé à
+                                            {{ $participant->checked_in_at->format('H:i') }}
+                                        </div>
+                                    @endif
+
+                                @else
+
+                                    <span class="text-muted small">
+                                        Non applicable
+                                    </span>
+
+                                @endif
+                            </td>
+
+                            <td>
+                                <div class="d-flex flex-column gap-2 align-items-start">
+
+                                    @if($participant->isConfirmedRegistration())
+
+                                        <x-admin.attendance-actions
+                                            :participant="$participant"
+                                        />
+
+                                    @endif
+
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        @if($participant->isWaiting())
+
+                                            <form
+                                                method="POST"
+                                                action="{{ route('admin.participants.update', $participant) }}"
+                                            >
+                                                @csrf
+                                                @method('PUT')
+
+                                                <input
+                                                    type="hidden"
+                                                    name="action"
+                                                    value="promote"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm btn-success"
+                                                >
+                                                    Promouvoir
+                                                </button>
+                                            </form>
+
+                                        @endif
 
                                         <a
                                             href="{{ route('admin.participants.edit', $participant) }}"
@@ -154,7 +369,7 @@
                                         <form
                                             method="POST"
                                             action="{{ route('admin.participants.destroy', $participant) }}"
-                                            onsubmit="return confirm('Supprimer cette inscription ?');"
+                                            onsubmit="return confirm('Supprimer définitivement ce dossier ?');"
                                         >
                                             @csrf
                                             @method('DELETE')
@@ -168,70 +383,24 @@
                                         </form>
 
                                     </div>
-                                </td>
 
-                            </tr>
+                                </div>
+                            </td>
 
-                        @endforeach
+                        </tr>
 
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
 
-            <div
-                id="no-results"
-                class="alert alert-info mt-3 d-none"
-            >
-                Aucun participant ne correspond à votre recherche.
-            </div>
+                </tbody>
+            </table>
+        </div>
 
-        @endif
+        <div class="mt-4">
+            {{ $participants->links() }}
+        </div>
 
-    </div>
-</div>
+    @endif
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('participant-search');
-    const sessionFilter = document.getElementById('session-filter');
-    const rows = document.querySelectorAll('.participant-row');
-    const countElement = document.getElementById('participant-count');
-    const noResults = document.getElementById('no-results');
-
-    function filterParticipants() {
-        const searchValue = searchInput.value.trim().toLowerCase();
-        const sessionValue = sessionFilter.value;
-
-        let visibleCount = 0;
-
-        rows.forEach(function (row) {
-            const matchesSearch =
-                searchValue === '' ||
-                row.dataset.search.includes(searchValue);
-
-            const matchesSession =
-                sessionValue === '' ||
-                row.dataset.session === sessionValue;
-
-            const shouldShow = matchesSearch && matchesSession;
-
-            row.classList.toggle('d-none', !shouldShow);
-
-            if (shouldShow) {
-                visibleCount++;
-            }
-        });
-
-        countElement.textContent = visibleCount;
-
-        if (noResults) {
-            noResults.classList.toggle('d-none', visibleCount !== 0);
-        }
-    }
-
-    searchInput.addEventListener('input', filterParticipants);
-    sessionFilter.addEventListener('change', filterParticipants);
-});
-</script>
+</x-admin.card>
 
 @endsection
